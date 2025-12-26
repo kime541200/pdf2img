@@ -4,19 +4,19 @@
 
 ## 功能
 
-*   **轉換核心**: 將 PDF 每一頁轉換為圖片 (支援 PNG, JPEG 等格式)
-*   **CLI 工具**: 方便的命令列操作
-*   **REST API Server**: 基於 FastAPI 的遠端轉換服務
-*   **Client 函式庫**: 方便整合至 Python 專案
-*   **Web UI**: 基於 Streamlit 的圖形化操作介面
+- **轉換核心**: 將 PDF 每一頁轉換為圖片 (支援 PNG, JPEG 等格式)，並支援**特定頁碼選擇**。
+- **CLI 工具**: 支援單一檔案或**整個目錄**的批次轉換，並自動建立子目錄管理輸出。
+- **REST API Server**: 基於 FastAPI 的遠端轉換服務
+- **Client 函式庫**: 方便整合至 Python 專案
+- **Web UI**: 基於 Streamlit 的圖形化操作介面
 
 ## 系統需求
 
 本工具依賴 `poppler`。
 
-*   **macOS**: `brew install poppler`
-*   **Linux (Debian/Ubuntu)**: `sudo apt-get install poppler-utils`
-*   **Windows**: 請下載 poppler 二進位檔案並加入 PATH。
+- **macOS**: `brew install poppler`
+- **Linux (Debian/Ubuntu)**: `sudo apt-get install poppler-utils`
+- **Windows**: 請下載 poppler 二進位檔案並加入 PATH。
 
 ## 安裝
 
@@ -57,8 +57,14 @@ pip install -e .
 安裝後，可以直接使用 `pdf2img` 指令：
 
 ```bash
-# 基本用法
+# 轉換單一 PDF (會在 output_images 下建立以檔名命名的子目錄)
 pdf2img path/to/file.pdf --output ./output_images
+
+# 批次轉換目錄下的所有 PDF
+pdf2img path/to/dir --output ./output_images
+
+# 轉換特定頁碼 (支援 "1,3,5-7" 格式)
+pdf2img path/to/file.pdf --output ./output_images --pages "1,3,5-7"
 
 # 指定格式與 DPI
 pdf2img path/to/file.pdf --output ./output_images --format jpeg --dpi 300
@@ -88,8 +94,8 @@ pdf2img-ui
 docker-compose up --build
 ```
 
-*   **Web UI**: `http://localhost:8501`
-*   **API Server**: `http://localhost:8000` (文件: `/docs`)
+- **Web UI**: `http://localhost:8501`
+- **API Server**: `http://localhost:8000` (文件: `/docs`)
 
 ### 4. Client 函式庫
 
@@ -132,9 +138,9 @@ pdf2img assets/example.pdf --output examples/output_images
 
 DPI (Dots Per Inch) 決定了轉換後圖片的解析度與清晰度。
 
-*   **72 - 96 DPI**: 適用於螢幕瀏覽，檔案較小，轉換速度快。
-*   **150 - 200 DPI** (預設): 適用於一般用途，在品質與檔案大小間取得平衡。
-*   **300+ DPI**: 適用於列印或後續需要進行 OCR (文字辨識) 的場景，檔案較大，轉換時間較長。
+- **72 - 96 DPI**: 適用於螢幕瀏覽，檔案較小，轉換速度快。
+- **150 - 200 DPI** (預設): 適用於一般用途，在品質與檔案大小間取得平衡。
+- **300+ DPI**: 適用於列印或後續需要進行 OCR (文字辨識) 的場景，檔案較大，轉換時間較長。
 
 您可以透過 CLI 的 `--dpi` 參數、UI 的滑桿或是 Client 函式庫的參數來調整此數值。
 
@@ -156,6 +162,17 @@ DPI (Dots Per Inch) 決定了轉換後圖片的解析度與清晰度。
         ├── server.py   # FastAPI Server
         └── ui.py       # Streamlit UI 應用程式
 ```
+
+## 常見問題與排除 (Troubleshooting)
+
+### 1. 無法讀取系統保護目錄 (例如 Downloads, Desktop)
+
+如果你在嘗試讀取其他目錄下的檔案時遇到 `is not readable` 或是 `PermissionError` 錯誤，這是因為 macOS 的 **TCC (Transparency, Consent, and Control)** 安全機制保護了這些目錄。
+
+**解決方法：**
+
+- **搬移檔案**: 將檔案搬移到專案目錄或其他非保護目錄。
+- **授權存取**: 在 macOS 的 `系統設定` > `隱私權與安全性` > `完整磁碟存取權限` 中，將你的終端機軟體 (如 Terminal, iTerm2 或 VS Code) 加入並開啟授權。
 
 ## License
 
